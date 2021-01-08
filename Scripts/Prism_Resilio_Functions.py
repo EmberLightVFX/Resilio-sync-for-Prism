@@ -168,29 +168,12 @@ class Prism_Resilio_Functions(object):
 
     @err_catcher(name=__name__)
     def openPBListContextMenu(self, origin, rcmenu, listWidget, item, path):
-        # gets called before "rcmenu" get displayed for the "Tasks" and "Versions" list in the Project Browser.
         resAct = QAction("Sync resilio content", origin)
         resAct.triggered.connect(lambda: self.resilioSync(path))
         rcmenu.addAction(resAct)
-        pass
 
     @err_catcher(name=__name__)
-    def resilioSync(self, path):
-        path = self.core.fixPath(path)
-        rlsl_files = []
-        rlsl_files += [each for each in os.listdir(
-            path) if each.lower().endswith(".rsls")]
-
-        for file in rlsl_files:
-            if platform.system() == 'Windows':
-                subprocess.Popen(
-                    'cmd /c "' + os.path.join(path, file) + '"')
-            else:
-                subprocess.Popen(
-                    ["open '" + os.path.join(path, file) + "'"], shell=True)
-
-    @err_catcher(name=__name__)
-    def openPBAssetContextMenu(self, origin, rcmenu, index):
+    def openPBAssetContextMenu(self, origin, rcmenu, index, path):
         """
         origin: Project Browser instance
         rcmenu: QMenu object, which can be modified before it gets displayed
@@ -199,24 +182,30 @@ class Prism_Resilio_Functions(object):
         pass
 
     @err_catcher(name=__name__)
-    def openPBAssetStepContextMenu(self, origin, rcmenu, index):
+    def openPBAssetStepContextMenu(self, origin, rcmenu, index, path):
         pass
 
     @err_catcher(name=__name__)
-    def openPBAssetCategoryContextMenu(self, origin, rcmenu, index):
+    def openPBAssetCategoryContextMenu(self, origin, rcmenu, index, path):
+        resAct = QAction("Sync resilio content", origin)
+        path = os.path.join(path, index.data())
+        resAct.triggered.connect(lambda: self.resilioSync(path))
+        rcmenu.addAction(resAct)
+
+    @err_catcher(name=__name__)
+    def openPBShotContextMenu(self, origin, rcmenu, index, path):
         pass
 
     @err_catcher(name=__name__)
-    def openPBShotContextMenu(self, origin, rcmenu, index):
+    def openPBShotStepContextMenu(self, origin, rcmenu, index, path):
         pass
 
     @err_catcher(name=__name__)
-    def openPBShotStepContextMenu(self, origin, rcmenu, index):
-        pass
-
-    @err_catcher(name=__name__)
-    def openPBShotCategoryContextMenu(self, origin, rcmenu, index):
-        pass
+    def openPBShotCategoryContextMenu(self, origin, rcmenu, index, path):
+        resAct = QAction("Sync resilio content", origin)
+        path = os.path.join(path, index.data())
+        resAct.triggered.connect(lambda: self.resilioSync(path))
+        rcmenu.addAction(resAct)
 
     @err_catcher(name=__name__)
     def projectBrowserContextMenuRequested(self, origin, menuType, menu):
@@ -320,3 +309,18 @@ class Prism_Resilio_Functions(object):
 
         Modify the integrationFiles paths to replace the default Prism integration files with custom ones
         """
+
+    @err_catcher(name=__name__)
+    def resilioSync(self, path):
+        path = self.core.fixPath(path)
+        rlsl_files = []
+        rlsl_files += [each for each in os.listdir(
+            path) if each.lower().endswith(".rsls")]
+
+        for file in rlsl_files:
+            if platform.system() == 'Windows':
+                subprocess.Popen(
+                    'cmd /c "' + os.path.join(path, file) + '"')
+            else:
+                subprocess.Popen(
+                    ["open '" + os.path.join(path, file) + "'"], shell=True)
